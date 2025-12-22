@@ -1,40 +1,40 @@
-#include <iostream>
-#include "Game.h"
+#include <SDL3/SDL.h>
 #include <vector>
+#include "Game.h"
+#include <iostream>
+
 
 //constructeur
-Game::Game(): Title("zero"), Width(800),Height(600),window(nullptr),renderer(nullptr){}
-Game::Game(const std::string& title, float width, float height)
-: Title(title), Width(width), Height(height),  
-      window(nullptr), renderer(nullptr) {}
+Game::Game() :Title("DIAGRAMME A BARRE"),Width(1200),Height(900),window(nullptr),renderer(nullptr){}
+//Destructeur
 Game::~Game(){}
 
-void Game::Render(SDL_Renderer * renderer, const std::vector<int>& data, int x,int y, int width, int height){
-  //Dessin des axes
-  SDL_SetRenderDrawColor(renderer,0,0,0,255);
-  //AXE y
-  SDL_RenderLine(renderer,x,y,x,y+height);
-  //AXE x
-  SDL_RenderLine(renderer,x,y+height,x+width,y+height);
-  int barCount = data.size();
-  int barWidth = width/ barCount;
-  int maxValue = 0;
-for (int value : data){
-  if (value>maxValue){
-    maxValue = value;
-  }
-}
-  //dessin des barres
-    SDL_SetRenderDrawColor(renderer,0,100,255,255);
-      for (int i = 0; i< barCount;i++){
-        int barHeight = ( data[i]*height);
-            SDL_FRect bar;
-            bar.x = x + i *barWidth ;
-            bar.y = y + (height - barHeight) ; // largeur
-            bar.w = barWidth - 5; //pour creer de l'espace entre les barres
-            bar.h = barHeight; //qui permet a la barre de monter vers le haut
-      
-            SDL_RenderFillRect(renderer, &bar);
+void Game::DrawDiagramme(){
 
-       }
-}
+  //donnees fixes
+  std::vector<int> data = {150, 220, 280, 200};
+  int Xstart = 100; //pour definir la position de depart sur X
+  int Ystart = 400;//pour definir la position de depart sur Y
+
+  int barWidth = 50; // la largeur des barres
+  int spacing = 20; //espace entre les barres
+  int maxHeight = 300; //pour definir la auteur maximale du graphique
+
+   //Dessin des axes
+    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+   //AXE y
+    SDL_RenderLine(renderer,Xstart,Ystart,Xstart,Ystart-maxHeight);
+  //AXE x
+  //DESSIN DES BARRES
+    SDL_SetRenderDrawColor(renderer,255,255,255,255);
+
+      for (size_t i=0; i < data.size();i++){
+        SDL_FRect bar;
+         bar.x = Xstart + spacing + i * (barWidth + spacing);
+         bar.w = barWidth;
+         bar.h = data[i];
+         bar.y = Ystart - bar.h;//pour monter depuis l'axe X
+         SDL_RenderFillRect(renderer, &bar);
+      }
+ }
+  

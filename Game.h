@@ -1,6 +1,8 @@
- #pragma once
-#include <iostream>
+#pragma once
+#ifndef GAME_H
+#define GAME_H
 #include <SDL3/SDL.h>
+#include <iostream>
 #include <vector>
 
 class Game {
@@ -12,10 +14,13 @@ bool isRunning;
     float Height; 
     std::string Title;  
 public: 
-    Game(const std::string& title, float width, float height); 
+    Game(); 
     ~Game(); 
 void Run(); 
 void HandleEvents(); 
 void Update();
 void Render(SDL_Renderer * renderer, const std::vector<int>& data, int x,int y, int width, int heigth);
+void DrawDiagramme();
 }; 
+
+#endif

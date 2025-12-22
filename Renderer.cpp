@@ -4,7 +4,7 @@
 #include <vector>    
  int main(){ 
 //Initialisation de SDL
-if (!SDL_Init(SDL_INIT_VIDEO)) { 
+if (!SDL_Init(SDL_INIT_VIDEO)!=0) { 
 std::cerr << "Erreur SDL_Init: " << SDL_GetError() << std::endl; 
 return 1; 
     } 
@@ -42,18 +42,21 @@ if (event.type == SDL_EVENT_QUIT) {
                 running = false; 
             } 
         } 
-// Dessine un fond bleu magnifique 
-        SDL_SetRenderDrawColor(renderer, 55, 255, 145, 70); 
+      
+// Dessine du fond de la fenetre
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
         SDL_RenderClear(renderer); 
-// Affiche le tout 
-    std::vector<int> values = {10,40,25,60,35};
-    Game game;
-    game.Render(renderer,values,50,50,400,300); 
+   // Affiche le tout
+Game game; 
+    game.DrawDiagramme();
+    SDL_FRect testBarre = {600 ,700 ,50 ,100};
+    SDL_RenderFillRect(renderer ,&testBarre);
         SDL_RenderPresent(renderer); 
+
+    } 
 // Petite pause (pour ne pas cramer le CPU) 
         SDL_Delay(16); // ~60 FPS 
-    } 
-//Nettoyage (on est bien élevés) 
+    //Nettoyage (on est bien élevés) 
  
     SDL_DestroyRenderer(renderer); 
     SDL_DestroyWindow(window); 
