@@ -2,7 +2,10 @@
 #include <SDL3/SDL.h> 
 #include "Game.h"  
 #include <vector>    
- int main(){ 
+#include"imgui.h"
+#include"imgui_impl_sdl3.h"
+#include"imgui_impl_sdlrenderer3.h"
+ int main(){
 //Initialisation de SDL
 if (!SDL_Init(SDL_INIT_VIDEO)!=0) { 
 std::cerr << "Erreur SDL_Init: " << SDL_GetError() << std::endl; 
@@ -32,36 +35,55 @@ std::endl;
 return 1; 
     } 
 //  Boucle principale (le cœur qui bat !) 
+IMGUI_CHECKVERSION();
+ImGui::CreateContext();
+ImGui::StyleColorsDark();
+
+ImGui_ImplSDL3_InitForSDLRenderer(window,renderer);
+ImGui_ImplSDLRenderer3_Init(renderer);
+
+Game game;
+int optionchoisie;
 
 bool running = true; 
     SDL_Event event; 
 while (running) { 
 // Gestion des événements 
 while (SDL_PollEvent(&event)) { 
+    ImGui_ImplSDL3_ProcessEvent(&event);
 if (event.type == SDL_EVENT_QUIT) { 
                 running = false; 
             } 
         } 
+
+       ImGui_ImplSDLRenderer3_NewFrame();
+       ImGui_ImplSDL3_NewFrame();
+        ImGui::NewFrame();
       
+      game.Render( renderer);
+        //game.Run(renderer);
+        ImGui::Render();
 // Dessine du fond de la fenetre
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
-        SDL_RenderClear(renderer); 
+       SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+       //Effacer le menu precedent 
+       SDL_RenderClear(renderer);
+       
+        ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),renderer);
+    
    // Affiche le tout
-Game game; 
-    game.DrawDiagramme();
-    SDL_FRect testBarre = {600 ,700 ,50 ,100};
-    SDL_RenderFillRect(renderer ,&testBarre);
+
         SDL_RenderPresent(renderer); 
 
     } 
 // Petite pause (pour ne pas cramer le CPU) 
         SDL_Delay(16); // ~60 FPS 
     //Nettoyage (on est bien élevés) 
- 
+   ImGui_ImplSDLRenderer3_Shutdown();
+   ImGui_ImplSDL3_Shutdown();
     SDL_DestroyRenderer(renderer); 
     SDL_DestroyWindow(window); 
     SDL_Quit(); 
 std::cout << "Au revoir ! 👋" << std::endl; 
-        
-return 0;
+      return 0;  
+
 }

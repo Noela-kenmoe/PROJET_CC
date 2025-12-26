@@ -2,39 +2,112 @@
 #include <vector>
 #include "Game.h"
 #include <iostream>
+#include "libs/imgui/imgui.h"
+#include "libs/imgui/backends/imgui_impl_sdl3.h"
+#include "libs/imgui/backends/imgui_impl_sdlrenderer3.h"
+#include "UI.h"
+#include "Renderer.h"
 
 
 //constructeur
-Game::Game() :Title("DIAGRAMME A BARRE"),Width(1200),Height(900),window(nullptr),renderer(nullptr){}
+Game::Game() :Title("DIAGRAMME A BARRE"),Width(1200),Height(900),window(nullptr){}
 //Destructeur
 Game::~Game(){}
 
-void Game::DrawDiagramme(){
+void Game::DrawDiagramme(SDL_Renderer* renderer){
 
   //donnees fixes
   std::vector<int> data = {150, 220, 280, 200};
-  int Xstart = 100; //pour definir la position de depart sur X
-  int Ystart = 400;//pour definir la position de depart sur Y
-
+  std::vector<int> dat = {123,45,250,300};
+  int Xstart = 300; //pour definir la position de depart sur X
+  int Ystart = 600;//pour definir la position de depart sur Y
+  int xs = 700;
   int barWidth = 50; // la largeur des barres
   int spacing = 20; //espace entre les barres
-  int maxHeight = 300; //pour definir la auteur maximale du graphique
-
+  int maxHeight = 450; //pour definir la auteur maximale du graphique
+   int space = 0;
    //Dessin des axes
-    SDL_SetRenderDrawColor(renderer,0,0,0,255);
+    SDL_SetRenderDrawColor(renderer,0,0,255,255);
    //AXE y
     SDL_RenderLine(renderer,Xstart,Ystart,Xstart,Ystart-maxHeight);
   //AXE x
+   SDL_RenderLine(renderer,Xstart,Ystart,Xstart+450,Ystart);
   //DESSIN DES BARRES
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
+    
+    SDL_Color colors []={
+      {255,0,0 ,255}, //couleur bleu
+      {0,0,255,255}, //
+      {0,255,0,255},
+      {255,165,0,255}
+    };
 
       for (size_t i=0; i < data.size();i++){
+        SDL_SetRenderDrawColor(renderer,colors[i].r,colors[i].g,colors[i].b,colors[i].a);
         SDL_FRect bar;
          bar.x = Xstart + spacing + i * (barWidth + spacing);
          bar.w = barWidth;
          bar.h = data[i];
          bar.y = Ystart - bar.h;//pour monter depuis l'axe X
          SDL_RenderFillRect(renderer, &bar);
+         }
+
+for (size_t i=0; i < dat.size();i++){
+       SDL_SetRenderDrawColor(renderer,colors[i].r,colors[i].g,colors[i].b,colors[i].a);
+        SDL_FRect bar;
+         bar.x = xs+ space + i * (barWidth + space);
+         bar.w = barWidth;
+         bar.h = dat[i];
+         bar.y = Ystart - bar.h;//pour monter depuis l'axe X
+         SDL_RenderFillRect(renderer, &bar);
       }
+
  }
+  Game game;
+  
+  void Game::Run(SDL_Renderer* renderer){
+    ImGui::Begin("affichge");
+       
+    if(currentDiagram == DiagramType::Barres && ImGui::RadioButton("exemple de diagramme",currentDiagram == DiagramType::Barres) ){
+      game.DrawDiagramme(renderer);
+    }
+    else if(currentDiagram == DiagramType::Camembert){
+      Game::DrawDiagramme(renderer);
+    }
+    else{
+      ImGui::Text("veuillez selectionnez un diagramme");
+    }
+
+       ImGui::End();
+       
+  
+    
+  }
+  bool Game::Render(SDL_Renderer* renderer){
+    
+    ImGui::Begin("Menu");
+    ImGui::Text("veillez choisir une option:");
+    ImGui::Separator();
+       if(ImGui::RadioButton("exemple de diagramme",currentDiagram == DiagramType::Barres))
+       {
+        currentDiagram = DiagramType::Barres;
+        
+       } 
+        if(ImGui::RadioButton("diagramme personnalisée",currentDiagram == DiagramType::Camembert)){
+        currentDiagram =DiagramType::Camembert;
+        game.Game::DrawDiagramme(renderer);
+        }
+        ImGui::Separator();
+       
+       if(currentDiagram == DiagramType::Barres){
+       ImGui::Text("option selectionnée : exemple de diagramme");
+       }else if (currentDiagram == DiagramType::Camembert)
+       {
+        ImGui::Text("option selectionnée : diagramme personnalisée");
+
+       }
+    
+       ImGui::End();
+       return true;
+    }
   

@@ -7,20 +7,29 @@
 
 class Game {
  private: 
-bool isRunning; 
+bool running; 
     SDL_Window* window; 
-    SDL_Renderer* renderer;
     float Width; 
     float Height; 
     std::string Title;  
 public: 
     Game(); 
     ~Game(); 
-void Run(); 
+void Run(SDL_Renderer* renderer); 
 void HandleEvents(); 
 void Update();
-void Render(SDL_Renderer * renderer, const std::vector<int>& data, int x,int y, int width, int heigth);
-void DrawDiagramme();
+bool Render(SDL_Renderer* renderer);
+void DrawDiagramme(SDL_Renderer* renderer);
+bool showBarChart = false;
+bool showPieChart = false;
+bool quit = false;
+
 }; 
 
+enum class DiagramType{
+    Barres,
+    Camembert,
+    Rien
+};
+static DiagramType currentDiagram = DiagramType::Rien;
 #endif
