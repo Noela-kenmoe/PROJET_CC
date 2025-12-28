@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL3/SDL.h> 
-#include "Game.h"  
+#include "Game.h"
+#include"UI.h"  
 #include <vector>    
 #include"imgui.h"
 #include"imgui_impl_sdl3.h"
@@ -59,9 +60,11 @@ if (event.type == SDL_EVENT_QUIT) {
        ImGui_ImplSDLRenderer3_NewFrame();
        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
+        
+        //DrawPie();
       
       game.Render( renderer);
-        //game.Run(renderer);
+       // game.Run(renderer);
         ImGui::Render();
 // Dessine du fond de la fenetre
        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

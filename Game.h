@@ -18,7 +18,7 @@ public:
 void Run(SDL_Renderer* renderer); 
 void HandleEvents(); 
 void Update();
-bool Render(SDL_Renderer* renderer);
+void Render(DiagramType& currentDiagram);
 void DrawDiagramme(SDL_Renderer* renderer);
 bool showBarChart = false;
 bool showPieChart = false;
@@ -26,10 +26,10 @@ bool quit = false;
 
 }; 
 
-enum class DiagramType{
+enum  DiagramType{
     Barres,
     Camembert,
     Rien
 };
-static DiagramType currentDiagram = DiagramType::Rien;
+ DiagramType currentDiagram = DiagramType::Rien;
 #endif

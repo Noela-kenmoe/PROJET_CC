@@ -8,3 +8,4 @@ enum class TypeDiagram {
     Rien
 };
  
+void DrawPie();

@@ -63,39 +63,48 @@ for (size_t i=0; i < dat.size();i++){
       }
 
  }
-  Game game;
+  //Game game;
   
-  void Game::Run(SDL_Renderer* renderer){
+  //void Game::Run(SDL_Renderer* renderer){
+    
+    /* if(!ShowDiagram){
     ImGui::Begin("affichge");
        
-    if(currentDiagram == DiagramType::Barres && ImGui::RadioButton("exemple de diagramme",currentDiagram == DiagramType::Barres) ){
-      game.DrawDiagramme(renderer);
-    }
-    else if(currentDiagram == DiagramType::Camembert){
-      Game::DrawDiagramme(renderer);
-    }
-    else{
-      ImGui::Text("veuillez selectionnez un diagramme");
-    }
+     switch (ShowDiagram)
+     {
+     case DiagramType::Barres: 
+     DrawDiagramme();
+      
+      break;
+     
+     default:
+      break;
+     }
+     }
 
        ImGui::End();
        
-  
     
-  }
-  bool Game::Render(SDL_Renderer* renderer){
-    
+  } */
+        
+  bool ShowDiagram = true;
+      
+
+  void Game::Render(DiagramType& currentDiagram){
+    if(!ShowDiagram) {
+
     ImGui::Begin("Menu");
     ImGui::Text("veillez choisir une option:");
     ImGui::Separator();
-       if(ImGui::RadioButton("exemple de diagramme",currentDiagram == DiagramType::Barres))
+       if(ImGui::Button("exemple de diagramme"))
        {
         currentDiagram = DiagramType::Barres;
-        
+        //ShowDiagram = false;
+      
        } 
         if(ImGui::RadioButton("diagramme personnalisée",currentDiagram == DiagramType::Camembert)){
         currentDiagram =DiagramType::Camembert;
-        game.Game::DrawDiagramme(renderer);
+        //ShowDiagram = false;
         }
         ImGui::Separator();
        
@@ -106,8 +115,24 @@ for (size_t i=0; i < dat.size();i++){
         ImGui::Text("option selectionnée : diagramme personnalisée");
 
        }
-    
-       ImGui::End();
-       return true;
-    }
-  
+     
+    ImGui::Separator();
+
+switch (currentDiagram)
+     {
+     case DiagramType::Barres: 
+     DrawDiagramme(renderer);
+      /* code */
+      break;
+     
+     default:
+      break;
+
+  }
+  if(ImGui::Button("retour au menu")){
+    ShowDiagram = true ;
+    currentDiagram = DiagramType::Rien;
+  }
+  ImGui::End();
+}
+}
