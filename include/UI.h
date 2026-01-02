@@ -1,6 +1,6 @@
 #include <iostream>
 #include <SDL3/SDL.h>
-#include "libs/imgui/imgui.h"
+
 
 enum class TypeDiagram {
     Bar,
@@ -8,4 +8,4 @@ enum class TypeDiagram {
     Rien
 };
  
-void DrawPie();
+void DrawPie(SDL_Renderer* renderer);

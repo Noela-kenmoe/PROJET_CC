@@ -1,15 +1,16 @@
 #include <iostream>
 #include "UI.h"
 #include <SDL3/SDL.h>
-#include "libs/imgui/imgui.h"
-#include "libs/imgui/backends/imgui_impl_sdl3.h"
-#include "libs/imgui/backends/imgui_impl_sdlrenderer3.h"
+#include "../libs/imgui/imgui.h"
+#include "../libs/imgui/backends/imgui_impl_sdl3.h"
+#include "../libs/imgui/backends/imgui_impl_sdlrenderer3.h"
 #include<vector>
 #include<cmath>
+#include<SDL3_ttf/SDL_ttf.h>
 
 
 
-void DrawPie(){
+void DrawPie(SDL_Renderer* renderer){
     
     static float a= 30.0f;
     static float b= 25.0f;

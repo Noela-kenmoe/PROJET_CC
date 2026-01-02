@@ -15,13 +15,12 @@ bool running;
 public: 
     Game(); 
     ~Game(); 
-void Run(SDL_Renderer* renderer); 
+void Run(); 
 void HandleEvents(); 
 void Update();
-void Render(DiagramType& currentDiagram);
+void Render();
 void DrawDiagramme(SDL_Renderer* renderer);
-bool showBarChart = false;
-bool showPieChart = false;
+
 bool quit = false;
 
 }; 
@@ -31,5 +30,20 @@ enum  DiagramType{
     Camembert,
     Rien
 };
- DiagramType currentDiagram = DiagramType::Rien;
+ //DiagramType currentDiagram = DiagramType::Rien;
+
+ //structure pour gerer les donnees et les labels
+ struct DiagramData{
+    std::vector<std::string> labels;
+    std::vector<float> values;
+ };
+
+
+ enum class View{
+    Menu,
+    BarDiagram,
+    PieDiagram
+ };
+ //View currentView = View::Menu;
+
 #endif
