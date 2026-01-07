@@ -9,6 +9,7 @@
 #include <SDL3_image/SDL_image.h>
 
 
+
  int main(){
 //Initialisation de SDL
 if (!SDL_Init(SDL_INIT_VIDEO)!=0) { 
@@ -53,14 +54,22 @@ ImGui_ImplSDLRenderer3_Init(renderer);
 SDL_Texture* texture = IMG_LoadTexture(renderer,"assets/OIP.png");
 
 Game game;
-int optionchoisie;
- bool showBarChart = false;
- bool showMenu = true;
-  bool showPieChart = false;
-bool running = true; 
-bool showBackground = true;
+   int optionchoisie;
+   bool showBarChart = false;
+   bool showMenu = true;
+   bool showPieChart = false;
+   bool running = true; 
+   bool showBackground = true;
+   bool showinput = false;
+   static bool showInput = true;
+   static bool showmenu = true;
+   static bool showChart = false;
+
     SDL_Event event; 
+    Uint64 lastime = SDL_GetTicks();
 while (running) { 
+  Uint64 now = SDL_GetTicks();
+  float deltatime = (now - lastime)/ 1000.0f;
 // Gestion des événements 
 while (SDL_PollEvent(&event)) { 
     ImGui_ImplSDL3_ProcessEvent(&event);
@@ -73,12 +82,7 @@ if (event.type == SDL_EVENT_QUIT) {
        ImGui_ImplSDL3_NewFrame();
         ImGui::NewFrame();
         
-        //DrawPie();
-      
-      //game.Render(currentDiagram);
-      // game.Run();
-
-      //dessin de l'interface utilisateur(UI)
+       
       
       static DiagramType currentDiagram = DiagramType::Rien;
 
@@ -86,7 +90,7 @@ if (event.type == SDL_EVENT_QUIT) {
     ImGui::Text("veillez choisir une option:");
     ImGui::Separator();
    
-       if(ImGui::Button("exemple de diagramme")) //bouton pour l'affichage du diagramme a barre
+       if(ImGui::Button("DIAGRAMME A BARRES")) //bouton pour l'affichage du diagramme a barre
        {
         //currentDiagram = DiagramType::Barres;
       showBarChart = true;
@@ -94,10 +98,10 @@ if (event.type == SDL_EVENT_QUIT) {
       showMenu = false;
       showBackground = false;
        }
-        if(ImGui::RadioButton("diagramme personnalisée",currentDiagram == DiagramType::Camembert)){
+        if(ImGui::Button("DIAGRAMME DE CAMEMBERT")){
         currentDiagram =DiagramType::Camembert;
         showBarChart = false;
-      showPieChart = true;
+      showPieChart = false;
       showMenu = false;
         }
        
@@ -113,20 +117,21 @@ if (event.type == SDL_EVENT_QUIT) {
      
     ImGui::End();
 
-     if(currentDiagram != DiagramType::Rien)
+     if(currentDiagram ==DiagramType::Barres)
      {
-     ImGui::Begin("diagramme ");
-     if(ImGui::Button(" diagramme a barre")) //bouton pour l'affichage du diagramme a barre
-       {
-        //currentDiagram = DiagramType::Barres;
-      showBarChart = true;
-      showPieChart = false;
+         ImGui::Begin("veuillez entrer 8 valeurs de votre choix");
+     //interface de sdaisie utilisateur
+      
+  
+        ImGui::End();
+
        }
        if(ImGui::Button(" diagramme de camembert")) //bouton pour l'affichage du diagramme de camembert
        {
         //currentDiagram = DiagramType::Barres;
       showBarChart = false;
       showPieChart = true;
+      showMenu = true;
        }
      if(currentDiagram == DiagramType::Barres){
      showBarChart = true;
@@ -137,9 +142,14 @@ if (event.type == SDL_EVENT_QUIT) {
      game.DrawDiagramme(renderer);
   }
   ImGui::End();
-}
 
-      //game.Render();
+
+      if(showinput ){
+       
+        game.Render(renderer);
+      //game.DrawDiagramme(renderer);
+      //DrawPie(renderer);
+       }
         ImGui::Render();
 // Dessine du fond de la fenetre
        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -147,19 +157,19 @@ if (event.type == SDL_EVENT_QUIT) {
        SDL_RenderClear(renderer);
 
        SDL_RenderTexture(renderer,texture,NULL,NULL);
+       SDL_SetRenderDrawColor(renderer,255,255,255,255);
        
        if(showBarChart){
         
         game.DrawDiagramme(renderer);
-         
-       }
-       if(showMenu){
-       // if(ImGui::Button(" diagramme de camembert")) {
-        showBarChart = false;
-        showMenu = true;
-      
+        
        }
        
+       if(showMenu){
+       
+        showBarChart = false;
+        showMenu = true;
+      }
        
         ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),renderer);
     
