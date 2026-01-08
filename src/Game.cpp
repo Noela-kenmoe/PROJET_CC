@@ -10,55 +10,75 @@
 #include <algorithm>
 #include<SDL3_ttf/SDL_ttf.h>
 #include<cmath>
+#include<string>
 
 //constructeur
 Game::Game() :Title("DIAGRAMME A BARRE"),Width(1200),Height(900),window(nullptr){}
 //Destructeur
 Game::~Game(){}
 
+  float userdata[barcount]= {0, 0, 0, 0,0,0,0,0};//valeurs d'entrée
+  float dat[pie] = {30,49,12,77,46,35};//pour l'animation
+  const double PI=3.14159265358979323846;
+  struct color
+  {
+    int r;
+    int g;
+    int b;
+    int a;
+  };
+  
+
 void Game::DrawDiagramme(SDL_Renderer* renderer){
 
   //donnees fixes
-    for(int i = 0;i< barcount;i++){
-        ImGui::InputFloat(("valeurs" + std::to_string(i+1)).c_str(),&userdata[i]);
-      }
-  int Xstart = 200; //pour definir la position de depart sur X
-  int Ystart = 600;//pour definir la position de depart sur Y
+    
+
+  
+  int Xstart =  300; //pour definir la position de depart sur X
+  int Ystart = 700;//pour definir la position de depart sur Y
   int xs = 700;
   int barWidth = 60; // la largeur des barres
-  int spacing = 40; //espace entre les barres
+  int spacing= 40; //espace entre les barres
   int maxHeight = 600; //pour definir la auteur maximale du graphique
-   int space = 20;
    float* current;
-   const float* target;
-   float speed = 5.0f; 
-   float Deltatime;
+   std::vector<std::string> label={"A","B","C","D","E","F","G","H"};
   
-   //interface ImGui pôur la saisie
+   
     
-    for(int i = 0; i<barcount ; i++){//calcul de la difference entre la valeur entréé par l'utilisateur et la valeur actuelle
-      float diff = target[i] - current[i];
-       if(fabs(diff)>0.01f){/*si la différence est significative on avance doucement vers la 
-                              valeur entrée par l'utlisateur*/
-        current[i] += diff*speed*Deltatime; //inter^polation lineaire
-       }else
-       current[i] = target[i];
-    }
+   
      //trouver la valeur maximale pour normalisé les hauteurs des barres
     const float* data;
     float maxvalues = 1.0f;
       for(int i = 0 ; i<barcount; i++){
-        if(data[i]>maxvalues){
-          maxvalues= data[i];
+        if(userdata[i]>maxvalues){
+          maxvalues= userdata[i];
         }
-        float barw = (float)barWidth/barcount;
+        int barw = (barWidth-spacing*(barcount+1))/barcount;
       }
    //Dessin des axes
     SDL_SetRenderDrawColor(renderer,0,0,255,255);
-   //AXE y
+    //AXE y
     SDL_RenderLine(renderer,Xstart,Ystart,Xstart,Ystart-maxHeight);
-  //AXE x
+    //fleche de l'axe x
+    SDL_RenderLine(renderer,Xstart+900,Ystart,Xstart+890,Ystart-5);
+    SDL_RenderLine(renderer,Xstart+900,Ystart,Xstart+890,Ystart+5);
+   
+    //AXE y 
    SDL_RenderLine(renderer,Xstart,Ystart,Xstart+900,Ystart);
+   //fleche de l'axe Y
+    SDL_RenderLine(renderer,Xstart,Ystart - 600,Xstart-5,Ystart-590);
+    SDL_RenderLine(renderer,Xstart,Ystart-600,Xstart-5,Ystart-590);//petit trait
+    
+
+    //graduation des axes
+    int step = 50; //distance entre les graduations
+    int valstep = 10; //valeur de chaque graduation
+      for(int i = 0; i<barcount; i++){
+        int ypos = Ystart - i*step;
+        SDL_RenderLine(renderer,Xstart-5,ypos,Xstart+5,ypos);//petit trait sur les axes
+        
+      }
   //DESSIN DES BARRES
     SDL_SetRenderDrawColor(renderer,255,255,255,255);
     
@@ -75,14 +95,17 @@ void Game::DrawDiagramme(SDL_Renderer* renderer){
     
     //Dessin des barres avec les coordonnées 
       for (size_t i=0; i < barcount;i++){
-        
+        int barh = (userdata[i]/maxvalues)*maxHeight;
         SDL_FRect bar;
          bar.x = Xstart + spacing + i * (barWidth + spacing);
          bar.w = barWidth;
-         bar.h = data[i];
+         bar.h = userdata[i];
          bar.y = Ystart - bar.h;//pour monter depuis l'axe X
+         //description sur chaque bar
+         
          SDL_SetRenderDrawColor(renderer,colors[i].a,colors[i].g,colors[i].b,colors[i].a);
          SDL_RenderFillRect(renderer, &bar);
+          
          }
 
 
@@ -97,49 +120,116 @@ void Game::DrawDiagramme(SDL_Renderer* renderer){
 
 
     static const int count = 7; // nombre de barres
-    static float data[count] = {0,0,0,0,0,0,0};
-    static char labels[count][32] = {"A","B","C","D","E","F","G"};
-    static ImVec4 colors[count] = {
+    //static float data[count] = {0,0,0,0,0,0,0};
+    //static char labels[count][32] = {"A","B","C","D","E","F","G"};
+    /*static ImVec4 colors[count] = {
       ImVec4(0.8f,0.2f,0.2f,0.1f),
        ImVec4(0.2f,0.8f,0.2f,0.1f),
       ImVec4(0.2f,0.2f,0.2f,0.8f),
        ImVec4(0.8f,0.8f,0.2f,0.1f),
-      ImVec4(0.8f,0.2f,0.8f,0.1f)};
+      ImVec4(0.8f,0.2f,0.8f,0.1f)};*/
 
       
-      
-      for(int i = 0 ; i<count; i++){
-        ImGui::InputFloat(labels[i], &data[i], 0.1f,10.0f,"%.2f");
+     /* SDL_Color colors [pie]={
+      {255,0,0 ,255}, //couleur rouge
+      {0,0,255,255}, //couleur bleu
+      {0,255,0,255},  //couleur vert
+      {255,165,0,255},  //couleur orange
+      {255,255,0,255} , //couleur jaune
+      {128,0,128,255},   //couleur violet 
+      };
+      int centerX,centrey,radius; // le centre et le rayon du cercle
+      //calcul la somme des valeurs afin de determiner les angles
+      float total = 0;
+      for(auto v : dat){
+        total +=v;
       }
+      float startangle = 0; //angle de depart pour la premiere part
+      for(int i = 0; i< 6; i++){
+        float scileangle = (dat[i]/total)*360.0f;//afin d'obtenir les protions en degres
+
       
-  
-  
-  
-    //trouver la valeur max pour les axes
-    float maxValues = 0.0f;
-    for(int i = 0; i< count ; i++){
-    if(data[i]>maxValues) maxValues = data[i];
+      //dessin des parts du camembert
+      SDL_SetRenderDrawColor(renderer,colors[i].r,colors[i].g,colors[i].b,255);
+      //on trace les lignes du centres vers le cercle pour remplir la part
+      for(float angle=startangle; angle<startangle+scileangle;angle +=1.0f){
+        float rad = angle * PI/180.0f;//conersion des angles en degres
+        int x = centerX+static_cast<int>((radius/1.5)*cos(rad));
+        int y = centrey +static_cast<int>(radius*sin(rad));
+       SDL_RenderLine(renderer,centerX,centrey,x,y);
+      }
+      //affichage des labels au milieu de la part
+      float midangle  = startangle + scileangle/2.0f;
+      float rd = midangle*PI/180.0f;
+      int labelx = centerX + static_cast<int>((radius/1.5f)*sin(rd));
 
+      startangle += scileangle;
+    }*/
+   ImGui::Text("si je  ois imgui marche");
+   ImDrawList* draw = ImGui::GetWindowDrawList();
+   ImVec2 p = ImGui::GetCursorScreenPos();
+   draw->AddRectFilled(ImVec2(p.x+20,p.y+20),ImVec2(p.x+120,p.y+120),IM_COL32(255,0,0,255));
+   ImGui::Dummy(ImVec2(150,150));
     
-    }
-    //Affichge des barres
-    for(int i = 0; i< count ; i++){
-      ImGui::Text("%s",labels[i]);
-      ImGui::SameLine(150); //Decalagehorizontal pour aligner les barres
-      ImGui::PushStyleColor(ImGuiCol_PlotHistogram,colors[i]);
-
-      ImGui::ProgressBar(data[i]/maxValues, ImVec2(200,0));
-      ImGui::PopStyleColor();
-      ImGui::SameLine();
-      ImGui::Text("%.2f",data[i]);
-    }
-    ImGui::Separator();
-    ImGui::Text("Axes : 0 ->%.2f(graduation automatique)",maxValues);
-
-    //Bouton retour au menu
     
   
   }
   
+  void Game::HandleEvents(SDL_Renderer* renderer){
+   std::vector<std::string> label={"A","B","C","D","E","F"};
+   int i;
+      float centx,centy;
+      float radius = 100.0f;
+      //std::string test;
+
+       std::vector<ImU32> colors = {
+        IM_COL32(255, 0, 0, 255),
+        IM_COL32(0, 255, 0, 255),
+        IM_COL32(0, 0, 255, 255),
+        IM_COL32(255, 255, 0, 255),
+        IM_COL32(0, 255, 0, 255),
+        IM_COL32(123 , 255, 0, 293)
+       };
+      
+      ImDrawList* draw_list = ImGui::GetWindowDrawList();
+      ImVec2 center = ImGui::GetCursorScreenPos();//position du curseur dans la fenetre
+      center.x += radius;
+      center.y += radius; //decalage pour centrer le cercle
+      //calcul la somme des valeurs afin de determiner les angles
+      float total = dat[0]+dat[1]+dat[2]+dat[3]+dat[4]+dat[5];
+      /*for(i = 0; i<pie ; i++){
+        total += dat[i];
+      }*/
+      if(total <= 0.0f) return ;
+      float startangle = 0.0f;//angle de depart pour chaque ^part
+      for (int i = 0; i< pie; i++){
+        float scileangle = (dat[i]/total)* 2.0f*PI; //portion en radiant
+        /*draw_list->PathClear();
+        draw_list->PathLineTo(center);*/
+        
+        //dessiner les parts
+        int numSegment = 40; //pour avoir un cercle plus lisse
+        for(int j = 0;j<numSegment;j++){
+          float t1 = startangle + scileangle*j/40.0f;//numSegment;
+          float t2 = startangle + scileangle * (j+1) /40.0f;//numSegment;
+           ImVec2 p1(center.x + radius* cos(t1), center.y + radius*sin(t1));
+          ImVec2 p2(center.x + radius* cos(t2), center.y + radius*sin(t2));
+          //draw_list->AddTriangleFilled(center,p1,p2,);
+          draw_list->AddTriangleFilled(center,p1,p2,IM_COL32(100+i*50,100,255,255));
+          }
+          // --- Ajouter le label au milieu de la part ---
+        /*float mid_angle = startangle + scileangle / 2.0f;
+        ImVec2 label_pos(center.x + radius * 0.6f * cos(mid_angle),
+                         center.y + radius * 0.6f * sin(mid_angle));*/
+        //draw_list->AddText(label_pos, IM_COL32(0,0,0,255), label[i].c_str());
+         //draw_list->PathFillConvex(colors[i]);
+         
+
+        startangle += scileangle;
+ }
+ ImGui::Dummy(ImVec2(radius * 2, radius * 2)); //reservation de l'espace
+  
+}
+ 
   
  

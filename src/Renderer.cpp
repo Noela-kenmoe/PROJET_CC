@@ -64,6 +64,7 @@ Game game;
    static bool showInput = true;
    static bool showmenu = true;
    static bool showChart = false;
+   bool choixval = false;
 
     SDL_Event event; 
     Uint64 lastime = SDL_GetTicks();
@@ -92,64 +93,72 @@ if (event.type == SDL_EVENT_QUIT) {
    
        if(ImGui::Button("DIAGRAMME A BARRES")) //bouton pour l'affichage du diagramme a barre
        {
-        //currentDiagram = DiagramType::Barres;
-      showBarChart = true;
+        currentDiagram = DiagramType::Barres;
+        
+      showBarChart = false;
       showPieChart = false;
       showMenu = false;
       showBackground = false;
+      choixval = false;
        }
-        if(ImGui::Button("DIAGRAMME DE CAMEMBERT")){
+        if(ImGui::Button("DIAGRAMME EN CAMEMBERT")){
         currentDiagram =DiagramType::Camembert;
         showBarChart = false;
       showPieChart = false;
       showMenu = false;
+      choixval = false; 
         }
        
         ImGui::Separator();
        
        if(currentDiagram == DiagramType::Barres){
-       ImGui::Text("option selectionnée : exemple de diagramme");
+       ImGui::Text("option selectionnée :  diagramme a barre");
        }else if (currentDiagram == DiagramType::Camembert)
        {
-        ImGui::Text("option selectionnée : diagramme personnalisée");
+        ImGui::Text("option selectionnée : diagramme en camembert");
 
        }
      
     ImGui::End();
 
-     if(currentDiagram ==DiagramType::Barres)
-     {
-         ImGui::Begin("veuillez entrer 8 valeurs de votre choix");
-     //interface de sdaisie utilisateur
-      
+       if(currentDiagram == DiagramType::Barres){
+          ImGui::Begin("veuillez entrer vos différents scores ");
+            //interface de sdaisie utilisateur pour le diagramme à barres
+           for(int i = 0;i< barcount;i++){
+               ImGui::InputFloat(("valeurs" + std::to_string(i+1)).c_str(),&userdata[i]);
+             }
+             if(ImGui::Button("VALIDER")){
+               showBarChart = true;
+               showPieChart = false;
+               showMenu = false;
+               showBackground = false;
+             }
   
-        ImGui::End();
-
-       }
-       if(ImGui::Button(" diagramme de camembert")) //bouton pour l'affichage du diagramme de camembert
-       {
-        //currentDiagram = DiagramType::Barres;
-      showBarChart = false;
-      showPieChart = true;
-      showMenu = true;
-       }
-     if(currentDiagram == DiagramType::Barres){
-     showBarChart = true;
-     game.DrawDiagramme(renderer);
-      }
-    else if(currentDiagram == DiagramType::Camembert){
-        showPieChart = true;
-     game.DrawDiagramme(renderer);
-  }
-  ImGui::End();
-
-
-      if(showinput ){
+          ImGui::End();
+        }
+      if(currentDiagram == DiagramType::Camembert){
+          ImGui::Begin("veuillez entrer vos différents scores");
+            //interface de sdaisie utilisateur pour le diagramme en camembert
+           for(int i = 0;i< pie;i++){
+               ImGui::InputFloat(("valeurs" + std::to_string(i+1)).c_str(),&dat[i]);
+             }
+             if(ImGui::Button("VALIDER")){
+               showBarChart = false;
+               showPieChart = true;
+               showMenu = false;
+               showBackground = false;
+             }
+  
+          ImGui::End();
+        }
+    
+       if(showPieChart){
        
-        game.Render(renderer);
-      //game.DrawDiagramme(renderer);
-      //DrawPie(renderer);
+        game.HandleEvents(renderer);
+        //game.Render(renderer);
+      
        }
+      
         ImGui::Render();
 // Dessine du fond de la fenetre
        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -170,6 +179,7 @@ if (event.type == SDL_EVENT_QUIT) {
         showBarChart = false;
         showMenu = true;
       }
+      
        
         ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(),renderer);
     
