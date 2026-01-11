@@ -7,7 +7,7 @@
 #include"imgui_impl_sdl3.h"
 #include"imgui_impl_sdlrenderer3.h"
 #include <SDL3_image/SDL_image.h>
-
+#include<SDL3_ttf/SDL_ttf.h>
 
 
  int main(){
@@ -16,7 +16,11 @@ if (!SDL_Init(SDL_INIT_VIDEO)!=0) {
 std::cerr << "Erreur SDL_Init: " << SDL_GetError() << std::endl; 
 return 1; 
     } 
-  //if(!IMG_Init)
+   /* if(TTF_Init() != 0){
+      std::cerr << "Erreur TTF_Init: "  << std::endl;
+     return -1;
+    }*/
+  
 std::cout << "SDL3 initialise avec succes ! 🎉" << std::endl; 
 // Création de la fenêtre 
     SDL_Window* window = SDL_CreateWindow( 
@@ -155,7 +159,7 @@ if (event.type == SDL_EVENT_QUIT) {
        if(showPieChart){
        
         game.HandleEvents(renderer);
-        //game.Render(renderer);
+        game.Render(renderer);
       
        }
       

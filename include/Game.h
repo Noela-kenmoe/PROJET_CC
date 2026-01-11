@@ -49,5 +49,6 @@ enum  DiagramType{
  const int pie=6;
  extern float userdata[barcount];//valeurs d'entrée pour le diagramme a barre
  extern float dat[pie] ;//pour valeurs d'entrée pour le diagramme
-
+ extern float current[barcount];
+ extern float maxval [barcount];
 #endif
