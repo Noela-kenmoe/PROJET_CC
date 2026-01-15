@@ -73,8 +73,7 @@ Game game;
     SDL_Event event; 
     Uint64 lastime = SDL_GetTicks();
 while (running) { 
-  Uint64 now = SDL_GetTicks();
-  float deltatime = (now - lastime)/ 1000.0f;
+  
 // Gestion des événements 
 while (SDL_PollEvent(&event)) { 
     ImGui_ImplSDL3_ProcessEvent(&event);
@@ -98,21 +97,21 @@ if (event.type == SDL_EVENT_QUIT) {
        if(ImGui::Button("DIAGRAMME A BARRES")) //bouton pour l'affichage du diagramme a barre
        {
         currentDiagram = DiagramType::Barres;
-        
+         //currentDiagram =DiagramType::Description;
       showBarChart = false;
       showPieChart = false;
       showMenu = false;
       showBackground = false;
       choixval = false;
        }
-        if(ImGui::Button("DIAGRAMME EN CAMEMBERT")){
+        if(ImGui::Button("DIAGRAMME EN CAMEMBERT")){ //bouton pour l' affichage du diagramme en camembert
         currentDiagram =DiagramType::Camembert;
         showBarChart = false;
       showPieChart = false;
       showMenu = false;
       choixval = false; 
         }
-       
+        
         ImGui::Separator();
        
        if(currentDiagram == DiagramType::Barres){
@@ -132,11 +131,15 @@ if (event.type == SDL_EVENT_QUIT) {
                ImGui::InputFloat(("valeurs" + std::to_string(i+1)).c_str(),&userdata[i]);
              }
              if(ImGui::Button("VALIDER")){
+              //currentDiagram = DiagramType::Rien;
+              
                showBarChart = true;
                showPieChart = false;
                showMenu = false;
                showBackground = false;
+               choixval = true; 
              }
+              
   
           ImGui::End();
         }
@@ -151,18 +154,26 @@ if (event.type == SDL_EVENT_QUIT) {
                showPieChart = true;
                showMenu = false;
                showBackground = false;
+               
              }
-  
+          
+
           ImGui::End();
         }
-    
+    if(choixval){
+        ImGui::Begin("LEGENDE ET DESCRIPTION");
+             game.Run( renderer);
+             
+             ImGui::End();
+           }
+           //boucle qui gere l'affichage du diagramme en camembert
        if(showPieChart){
        
         game.HandleEvents(renderer);
-        game.Render(renderer);
-      
+       game.Render(renderer);
+         //game.Update( renderer);
        }
-      
+       
         ImGui::Render();
 // Dessine du fond de la fenetre
        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);

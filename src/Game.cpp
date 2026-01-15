@@ -17,12 +17,17 @@ Game::Game() :Title("DIAGRAMME A BARRE"),Width(1200),Height(900),window(nullptr)
 //Destructeur
 Game::~Game(){}
 
-   float userdata[barcount]= {30, 50, 60, 70,80,90,100,150};//valeurs d'entrée
+   float userdata[barcount]= {140, 90, 340, 540,280,480,50,230};//valeurs d'entrée
    float dat[pie] = {120,80,230,430,330,270};//pour l'animation
-  float current [barcount]= {0,0,0,0,0,0,0,0};
+   float current [barcount]= {0,0,0,0,0,0,0,0};
+   float currentbar[pie]= {0,0,0,0,0,0};
   const double PI=3.14159265358979323846;
   float maxval [barcount]={0,0,0,0,0,0,0,0};
   std::string lab[barcount]={"A","B","C","D","E","F","G","H"};
+  
+static Uint32 now = SDL_GetTicks();
+Uint32 lastime = SDL_GetTicks();
+float  deltatime = (now- lastime)/1000.0f;
   struct color
   {
     int r;
@@ -35,9 +40,21 @@ std::vector<ImU32> couleur = {
         IM_COL32(0, 255, 0, 255),
         IM_COL32(0, 0, 255, 255),
         IM_COL32(255, 255, 0, 255),
-        IM_COL32(0, 255, 0, 255),
+        IM_COL32(139, 20, 147, 255),
         IM_COL32(123 , 255, 0, 293)
        };  
+       std::vector<ImU32> couleurs = {
+        IM_COL32(255, 0, 0, 255),
+        IM_COL32(0, 0, 255, 255),
+        IM_COL32(0, 255, 0, 255),
+        IM_COL32(255,165,0,255),
+        IM_COL32(255, 255, 0, 255),
+        IM_COL32(128, 0, 128, 255),
+        IM_COL32(255 , 20,147, 255),
+        IM_COL32(139,69,19,255)
+        
+       };  
+std::vector<std::string> labels={"A","B","C","D","E","F","G","H"};
 
 void Game::DrawDiagramme(SDL_Renderer* renderer){
 
@@ -45,15 +62,15 @@ void Game::DrawDiagramme(SDL_Renderer* renderer){
     
 
   
-  int Xstart =  300; //pour definir la position de depart sur X
+  int Xstart =  330; //pour definir la position de depart sur X
   int Ystart = 700;//pour definir la position de depart sur Y
-  int xs = 700;
+  int i;
   int barWidth = 60; // la largeur des barres
   int spacing= 40; //espace entre les barres
   int maxHeight = 600; //pour definir la auteur maximale du graphique
    //float* current;
    float Deltatime = 100.0f;
-   std::vector<std::string> label={"A","B","C","D","E","F","G","H"};
+   
    float textX=600;
    float  textY= 400;
    float spacetext = 30;
@@ -61,56 +78,34 @@ void Game::DrawDiagramme(SDL_Renderer* renderer){
    
     //gestion de l'animation
     float speed = 3.1f;
-    for(int i = 0;i<barcount;i++){
-      float diff = userdata[i] - current[i];
-      // if(fabs(diff)>0.01f){
-      current[i] += diff*speed*Deltatime;
-      //}
-    }
-   
-     //trouver la valeur maximale pour normalisé les hauteurs des barres
+    
+    for(int i = 0; i<pie;i++){
+      if(current[i]<userdata[i]){
+        currentbar[i] += speed;
+      }
+      if(current[i]>userdata[i]){
+        current[i] = userdata[i];
+      }
+     }
+     //trouver la valeur maximale pour normaliser les hauteurs des barres
     const float* data;
     float maxvalues = 1.0f;
-      for(int i = 0 ; i<barcount; i++){
-        if(userdata[i]>maxvalues){
-          maxvalues= userdata[i];
+      for(float v : userdata){
+        if(v >maxvalues){
+          maxvalues= v;
         }
         int barw = (barWidth-spacing*(barcount+1))/barcount;
       }
+      
       SDL_SetRenderDrawColor(renderer,0,0,0,255);
+      
+      
       SDL_FRect bakc= {20,20,11500,850};
+       SDL_RenderFillRect(renderer, &bakc);
       
-      SDL_RenderFillRect(renderer, &bakc);
-      TTF_Font* font;
-      
-      //Uint32 col=(255,255,255,255);
-     //trouver  la valeurs max pour faire les comparaison
-     maxval[0] = userdata[0];
-     int index = 0;
-
-     for(int i= 0; i<barcount ; i++){
-        if(userdata[i]>maxval[i]){
-          maxval[i]= userdata[i];
-          index = i;
-        }
-     }
-     //creation des textes de comparaison
-     for(int i = 0; i<barcount;i++){
-       std::string text;
-       if(i== index) text = lab[i]+"est la plus haute barre";
-       else text = lab[i]+"inferieur à"+ lab[index];
-       /*SDL_Surface* surf = TTF_RenderText_Blended(font,text.c_str(),col);
-        SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer,surf);
-       SDL_FRect RCT= {textX,textY+i*spacetext,surf->w,surf->h};
-       SDL_DestroySurface(surf);
-       SDL_RenderTexture(renderer,texture,nullptr,&RCT);
-       SDL_DestroyTexture(texture);*/
-
-     }
-      //TTF_RenderText_Blended(font,text.c_str(),col)
    //Dessin des axes
     SDL_SetRenderDrawColor(renderer,0,0,255,255);
-    //AXE y
+    //AXE x
     SDL_RenderLine(renderer,Xstart,Ystart,Xstart,Ystart-maxHeight);
     //fleche de l'axe x
     SDL_RenderLine(renderer,Xstart+900,Ystart,Xstart+890,Ystart-5);
@@ -141,63 +136,75 @@ void Game::DrawDiagramme(SDL_Renderer* renderer){
       {255,165,0,255},  //couleur orange
       {255,255,0,255} , //couleur jaune
       {128,0,128,255},     //couleur violet
-      {255,192,203,255} ,  //couleur rose
-      {255,140,0,255}     //couleur orange
+      {255,20,147,255} ,  //couleur rose
+      {139,69,19,255}     //couleur orange
     };
+    
     
     //Dessin des barres avec les coordonnées 
       for (size_t i=0; i < barcount;i++){
+        //mise a l'echelle ^pour eviter que les barres dépassent la fentre
+        float echelle =userdata[i]/maxvalues;
         int barh = (userdata[i]/maxvalues)*maxHeight;
+         
         SDL_FRect bar;
          bar.x = Xstart + spacing + i * (barWidth + spacing);
          bar.w = barWidth;
-         bar.h = userdata[i];
+         bar.h = static_cast<int>(echelle*maxHeight);
          bar.y = Ystart - bar.h;//pour monter depuis l'axe X
          //description sur chaque bar
          
-         SDL_SetRenderDrawColor(renderer,colors[i].a,colors[i].g,colors[i].b,colors[i].a);
+         SDL_SetRenderDrawColor(renderer,colors[i].r,colors[i].g,colors[i].b,colors[i].a);
          SDL_RenderFillRect(renderer, &bar);
           
          }
 
 
       SDL_SetRenderDrawColor(renderer,255,255,255,255);
- SDL_Delay(2000);
- TTF_CloseFont(font);
- TTF_Quit();
+ //SDL_Delay(2000);
+  
  }
-  //Game game;
+  
 
   void Game::Render(SDL_Renderer* renderer){
-
     
-
-
-    
-    float radius = 120.0f;
+    float radius = 220.0f;
     std::vector<std::string> label={"A","B","C","D","E","F"};
     float startangle = 0.0f;
      float endangle;
+     float step =   0.1f;
 
     ImDrawList* draw = ImGui::GetWindowDrawList();
     ImVec2 windowposition = ImGui::GetCursorScreenPos();//position de la fenetre
       ImVec2 center = ImGui::GetCursorScreenPos();
-      center.x +=150;
+      center.x +=350; //pour determiner la position du diagramme dans la fenetre
       center.y += 150;
-    ImVec2 mouseposition = ImGui::GetMousePos();
+
+    //gestion de l'animation
+    for(int i = 0; i<pie;i++){
+      if(currentbar[i]<dat[i]){
+        currentbar[i] += step;
+      }
+      if(currentbar[i]>dat[i]){
+        current[i] = dat[i];
+      }
+    }
 
    float total = 0.0f;
       for(int i = 0;i<pie;i++){
-        total +=dat[i] ;
+        total +=currentbar[i] ;
       }
-    
+      //pour eviter la division par zero
+    if(total == 0){
+      total=1;
+    }
     
      
 ;      //calcul la somme des valeurs afin de determiner les angles
       
        startangle = 0; //angle de depart pour la premiere part
       for(int i = 0; i< 6; i++){
-        float scileangle = (dat[i]/total)*2.0f*PI;//afin d'obtenir les protions en degres
+        float scileangle = (currentbar[i]/total)*2.0f*PI;//afin d'obtenir les protions en degres
          endangle = startangle+ scileangle;
        /*ImVec2 souris = ImVec2(mouseposition.x -(windowposition.x+center.x),mouseposition.y-(windowposition.y+center.y));
    float dist = sqrt(souris.x*souris.x+souris.y*souris.y);
@@ -281,8 +288,8 @@ void Game::DrawDiagramme(SDL_Renderer* renderer){
   ImGui::EndGroup();
 }
  
-  /*void Update(){
-    ImVec2 mouseposition;
+  void Game::Update(SDL_Renderer* renderer){
+    /*ImVec2 mouseposition;
     ImGui::GetMousePos();
     ImVec2 souris = (ImVec2(mouseposition.x -windowpos.x+Center.x),mouseposition.y-(windowpos.y+center.y));
 
@@ -295,7 +302,84 @@ void Game::DrawDiagramme(SDL_Renderer* renderer){
     //boucle qui permet de verifier si la souris est sur la part
     bool verifive = (angleSouris>= startangle && angleSouris <= endanle);
     if(verifive){
-      float radius = (radius*1.1f);
+      float radius = (radius*1.1f);*/
+  const float* values;
+    const ImU32* colors;
+    int count;
+    ImVec2 center;
+    float baseRadius;
+    ImDrawList* draw = ImGui::GetWindowDrawList();
+    ImVec2 mouse = ImGui::GetIO().MousePos;
+
+    float total = 0.0f;
+    for (int i = 0; i < count; i++)
+        total += dat[i];
+
+    std::vector<float> currentRadius;
+    if ((int)currentRadius.size() != count)
+        currentRadius.assign(count, baseRadius);
+
+    float startAngle = 0.0f;
+    float hoverRadius = baseRadius * 1.15f;
+    float speed = 8.0f;
+
+    for (int i = 0; i < count; i++)
+    {
+        float sliceAngle = (values[i] / total) * PI * 2.0f;
+        float endAngle = startAngle + sliceAngle;
+
+        // --- Détection souris ---
+        float dx = mouse.x - center.x;
+        float dy = mouse.y - center.y;
+        float dist = sqrtf(dx * dx + dy * dy);
+
+        float angle = atan2f(dy, dx);
+        if (angle < 0) angle += PI * 2.0f;
+
+        bool hovered =
+            dist <= hoverRadius &&
+            angle >= startAngle &&
+            angle <= endAngle;
+
+        // --- Animation rayon ---
+        float target = hovered ? hoverRadius : baseRadius;
+        currentRadius[i] += (target - currentRadius[i]) *
+                            speed * ImGui::GetIO().DeltaTime;
+
+        // --- Dessin ---
+        draw->PathArcTo(center,
+                        currentRadius[i],
+                        startAngle,
+                        endAngle,
+                        40);
+
+        draw->PathLineTo(center);
+        draw->PathFillConvex(couleur[i]);
+
+        // Tooltip optionnel
+        if (hovered)
+            ImGui::SetTooltip("Valeur : %.2f", values[i]);
+
+        startAngle = endAngle;
     }
-  }*/
+}
+  void Game::Run(SDL_Renderer* renderer){
+
+    ImGui::BeginGroup();//afin de garder les elements alignés
+    ImGui::Text("LEGENDE");
+    ImGui::Separator();
+    for(int i = 0; i< barcount;i++){
+      ImU32 u32_col = couleurs[i];// on recupere la couleur de la part
+    ImVec4 car = ImGui::ColorConvertU32ToFloat4(u32_col);//conversion de la couleur de ImU32 pour obtenir un ImVec4
+        ImGui::ColorButton(labels[i].c_str(),car,ImGuiColorEditFlags_NoTooltip,ImVec2(14,14));
+        ImGui::SameLine();//pour mettre le texte sur la meme ligne que le carré
+        //affichage label
+        ImGui::Text("%s:%.1f",labels[i].c_str(),userdata[i]);
+        }
+        ImGui::EndGroup();
+        ImGui::Separator();
+        //AFFICHAGE DE LA DESCRIPTION
+        //ImGui::TextWrapped("");
+        
+  }
  
